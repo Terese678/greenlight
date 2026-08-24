@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greenlight — decide what to shoot next</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDE6D6;
+    --paper-dim: #E3DACB;
+    --ink: #1B1B18;
+    --slate: #566169;
+    --hold: #B33A2E;
+    --standby: #D98F2B;
+    --go: #4E7A51;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Serif', serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--go); color: var(--paper); }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  .display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+    line-height: 0.92;
+  }
+
+  .lamp-panel {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    z-index: 50;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--ink);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(27,27,24,0.25);
+  }
+
+  .lamp {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #3a3a35;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .lamp[data-color="hold"].on { background: var(--hold); box-shadow: 0 0 9px 2px rgba(179,58,46,0.75); }
+  .lamp[data-color="standby"].on { background: var(--standby); box-shadow: 0 0 9px 2px rgba(217,143,43,0.75); }
+  .lamp[data-color="go"].on { background: var(--go); box-shadow: 0 0 9px 2px rgba(78,122,81,0.75); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lamp { transition: none; }
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  header.hero {
+    padding: 120px 0 80px;
+  }
+
+  .wordmark {
+    font-size: clamp(3.4rem, 11vw, 6.2rem);
+    margin: 0 0 6px;
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--slate);
+    margin: 0 0 34px;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-copy {
+    font-size: 1.22rem;
+    max-width: 34ch;
+    margin: 0 0 40px;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+    padding: 14px 22px;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: transform 0.15s ease;
+  }
+  .cta:hover { transform: translateY(-1px); }
+  .cta::after { content: "→"; font-family: sans-serif; }
+
+  .preview-card {
+    margin-top: 56px;
+    background: var(--paper-dim);
+    border: 1px solid rgba(27,27,24,0.12);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    max-width: 480px;
+  }
+  .preview-card .label { margin-bottom: 10px; display: block; }
+  .preview-card p { margin: 0; font-size: 0.98rem; }
+
+  .stage {
+    padding: 96px 0;
+    border-top: 1px solid rgba(27,27,24,0.12);
+  }
+
+  .stage-eyebrow {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper);
+    margin-bottom: 22px;
+  }
+  .stage[data-color="hold"] .stage-eyebrow { background: var(--hold); }
+  .stage[data-color="standby"] .stage-eyebrow { background: var(--standby); }
+  .stage[data-color="go"] .stage-eyebrow { background: var(--go); }
+
+  .stage h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    margin: 0 0 16px;
+    letter-spacing: 0.01em;
+  }
+
+  .stage p {
+    font-size: 1.08rem;
+    max-width: 52ch;
+    margin: 0;
+    color: #2c2c28;
+  }
+
+  .transcript {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: var(--radius);
+    padding: 26px 24px;
+    margin-top: 30px;
+  }
+  .transcript .label { color: #9a9a92; margin-bottom: 14px; display: block; }
+  .msg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    padding: 12px 0;
+    border-top: 1px solid rgba(237,230,214,0.15);
+  }
+  .msg:first-of-type { border-top: none; padding-top: 0; }
+  .msg .who {
+    color: var(--go);
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .minds-note {
+    padding: 64px 0;
+    border-top: 1px solid rgba(27,27,24,0.12);
+  }
+  .minds-note p {
+    font-size: 1.05rem;
+    max-width: 52ch;
+  }
+  .minds-note .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+    border: 1px solid var(--slate);
+    border-radius: 2px;
+    padding: 3px 8px;
+    margin-bottom: 18px;
+  }
+
+  footer {
+    padding: 40px 0 60px;
+    border-top: 1px solid rgba(27,27,24,0.12);
+  }
+  footer p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--slate);
+    margin: 0;
+  }
+
+  @media (max-width: 560px) {
+    header.hero { padding: 96px 0 60px; }
+    .lamp-panel { top: 14px; right: 14px; padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="lamp-panel" aria-hidden="true">
+    <span class="lamp" data-color="hold"></span>
+    <span class="lamp" data-color="standby"></span>
+    <span class="lamp" data-color="go"></span>
+  </div>
+
+  <div class="wrap">
+    <header class="hero">
+      <p class="label">for content creators · built on minds</p>
+      <h1 class="wordmark display">Greenlight</h1>
+      <p class="tagline">an agent that tells you which video to shoot next</p>
+      <p class="hero-copy">Greenlight compares your next idea against what has actually worked for your channel before — not a generic "this looks viral" score.</p>
+      <a class="cta" href="https://t.me/Greenlight_TTC_bot" target="_blank" rel="noopener">Talk to Greenlight</a>
+
+      <div class="preview-card">
+        <span class="label">from a real conversation</span>
+        <p>"The time-pressure race format is clearly working, so the move is to stay in that lane while the topic's still hot."</p>
+      </div>
+    </header>
+
+    <section class="stage" data-color="hold" id="stage-hold">
+      <span class="stage-eyebrow">Hold — no data yet</span>
+      <h2>It asks before it guesses.</h2>
+      <p>New to Greenlight, no videos logged yet? It asks about your niche and who you admire, then gives a first opinion — clearly marked as general guidance, not a score against your own numbers.</p>
+    </section>
+
+    <section class="stage" data-color="standby" id="stage-standby">
+      <span class="stage-eyebrow">Standby — a few videos in</span>
+      <h2>It starts learning your audience.</h2>
+      <p>Once you've shared results from a few videos, Greenlight has a real pattern to work from. It tells you plainly when it's made the switch from general advice to reading your own history.</p>
+    </section>
+
+    <section class="stage" data-color="go" id="stage-go">
+      <span class="stage-eyebrow">Go — dialed in</span>
+      <h2>It reaches out when something's working.</h2>
+      <p>Greenlight watches your channel's performance. When a video is doing better than usual, it messages you first — with follow-up ideas, while the topic's still hot.</p>
+
+      <div class="transcript">
+        <span class="label">Telegram — Aug 20</span>
+        <div class="msg">
+          <span class="who">system trigger</span>
+          "15-Minute Pasta Race" is at 4,800 views, well above this creator's recent average.
+        </div>
+        <div class="msg">
+          <span class="who">Greenlight</span>
+          The time-pressure race format is clearly working. Two follow-ups worth weighing: the 10-Minute Stir-Fry Sprint, or the Fridge-Clearout Race. My lean — shoot the stir-fry first, it's the lowest-friction sequel.
+        </div>
+      </div>
+    </section>
+
+    <section class="minds-note">
+      <span class="badge">Built on Minds by Animoca Brands</span>
+      <p>Greenlight's memory and reasoning run on Minds — a persistent agent platform. What you see here is the product's own voice, not a script.</p>
+    </section>
+
+    <footer>
+      <p>Creative Minds Jam #1: Hong Kong — Audience Growth &amp; Engagement track. Built by Timothy Terese Chimbiv.</p>
+    </footer>
+  </div>
+
+  <script>
+    const lamps = document.querySelectorAll('.lamp');
+    const stages = document.querySelectorAll('.stage');
+
+    function setActive(color) {
+      lamps.forEach(l => l.classList.toggle('on', l.dataset.color === color));
+    }
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) setActive(entry.target.dataset.color);
+        });
+      }, { rootMargin: '-40% 0px -40% 0px' });
+
+      stages.forEach(s => observer.observe(s));
+    } else {
+      setActive('hold');
+    }
+  </script>
+
+</body>
+</html>
