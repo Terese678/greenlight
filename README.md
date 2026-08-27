@@ -2,6 +2,8 @@
 
 **Built for Creative Minds Jam #1: Hong Kong — Audience Growth & Engagement track.**
 
+**[Live landing page →](https://terese678.github.io/greenlight/landing/)**
+
 ## How this started
 
 Every creator has the same 11pm problem: three video ideas, one
