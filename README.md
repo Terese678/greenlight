@@ -81,13 +81,21 @@ naturally cross the threshold. Greenlight replied with two specific,
 differentiated follow-up ideas and its own reasoning for ranking
 them, confirming the whole loop works end to end.
 
-**6. Publishing to the Bazaar.** Idea Scoring is now listed in the
-Minds Bazaar, any creator can find and equip it on their own Mind
-directly, no manual prompt-copying required. This came out of a real
-onboarding test: getting a second person a fully personalized
-instance of Greenlight required four manual steps, sign up, launch a
-Mind, paste two prompts, then talk to it, which is real friction for
-anyone who isn't a developer. Publishing closes that gap.
+**6. Publishing to the Bazaar.** The Skill is now listed in the
+Minds Bazaar under the name "Greenlight," any creator can find and
+equip it on their own Mind directly, no manual prompt-copying
+required. This came out of a real onboarding test: getting a second
+person a fully personalized instance of Greenlight required four
+manual steps, sign up, launch a Mind, paste two prompts, then talk
+to it, which is real friction for anyone who isn't a developer.
+Publishing closes that gap. It also took two attempts to actually
+verify: the first "rename to Greenlight" report turned out to be
+false, the artifact's internal name changed but the catalog's
+registry listing didn't, so searching "Greenlight" found nothing.
+Caught by checking the Bazaar directly instead of trusting the
+report, then fixed and re-verified the same way. Worth knowing if
+you extend this: confirm platform-side claims by observing the
+actual result, not the tool's reported success.
 
 ## Architecture
 
@@ -118,7 +126,7 @@ for the conversation itself, the chat *is* the product.
 
 ## How this scales
 
-Idea Scoring is live in the Minds Bazaar today, any creator can find
+Greenlight is live in the Minds Bazaar today, any creator can find
 it and equip it on their own Mind directly. That's the real
 distribution path: not "everyone messages this one Mind," but each
 creator launching their own (seconds, no code) and installing the
@@ -159,18 +167,18 @@ blocker. That's the next build, not a gap in this one.
 ## Setup
 
 1. Install dependencies:
-   ```
+```
    npm install
-   ```
+```
 2. Copy `.env.example` to `.env` and fill in:
    - `MINDS_BUILDER_API_KEY` from your hellominds.ai builder console
    - `GREENLIGHT_MIND_ID` from Greenlight's profile page
    - `YOUTUBE_API_KEY` from Google Cloud Console
    - `YOUTUBE_CHANNEL_ID` for the creator being tracked
 3. Run:
-   ```
+```
    npm run dev
-   ```
+```
 
 ## Status
 
