@@ -61,30 +61,33 @@ assembles the reasoning, memory, and playbook itself. The repo's
 actual job shrank to something narrower and more honest: orchestrate
 around Greenlight, don't try to be its brain.
 
-**3. Teaching Act One and Act Two together.** The Idea Scoring skill
-was built as a single conversation with Greenlight, describing the
-cold-start onboarding and the switch to personalized mode as two
-halves of one behavior, not separate features. See
-`src/skills/idea-scoring-skill.md` for the exact prompts used.
+**3. Teaching Act One, Two, and Three together.** The Idea Scoring
+skill was built as a single conversation with Greenlight, and it
+turned out to be one Skill, not several: cold-start onboarding, the
+switch to personalized mode, and the proactive breakout follow-up
+all live inside it as branches of one behavior, not separate
+features. See `src/skills/idea-scoring-skill.md` for the exact
+prompts used.
 
 **4. Wiring the eyes.** `src/youtube/client.ts` pulls a channel's
 recent videos and compares the newest one against the creator's own
 average, real data, not a vibe.
 
-**5. Teaching Act Three.** The Proactive Follow-Up skill is what
-makes Greenlight autonomous, not reactive. `src/scheduler/checkPerformance.ts`
-detects when a video is outperforming and hands Greenlight the raw
-fact. What Greenlight does with that fact, deciding what to suggest
-and reaching out on its own, is entirely its own reasoning, not a
-scripted response. See `src/skills/proactive-followup-skill.md`.
+**5. Proving the proactive branch actually fires.** A synthetic
+trigger test (`src/scheduler/testProactiveTrigger.ts`) sent
+Greenlight a fabricated "this video is outperforming" message, the
+same shape our real code sends, without waiting for a real video to
+naturally cross the threshold. Greenlight replied with two specific,
+differentiated follow-up ideas and its own reasoning for ranking
+them, confirming the whole loop works end to end.
 
-**6. Proving Act Three actually fires.** A synthetic trigger test
-(`src/scheduler/testProactiveTrigger.ts`) sent Greenlight a fabricated
-"this video is outperforming" message, the same shape our real code
-sends, without waiting for a real video to naturally cross the
-threshold. Greenlight replied with two specific, differentiated
-follow-up ideas and its own reasoning for ranking them, confirming
-the whole loop works end to end.
+**6. Publishing to the Bazaar.** Idea Scoring is now listed in the
+Minds Bazaar, any creator can find and equip it on their own Mind
+directly, no manual prompt-copying required. This came out of a real
+onboarding test: getting a second person a fully personalized
+instance of Greenlight required four manual steps, sign up, launch a
+Mind, paste two prompts, then talk to it, which is real friction for
+anyone who isn't a developer. Publishing closes that gap.
 
 ## Architecture
 
@@ -95,7 +98,7 @@ greenlight/
 │   ├── youtube/     # YouTube Data API client, pulls video stats
 │   ├── scheduler/   # polls performance data, triggers proactive follow-up
 │   ├── skills/      # the exact prompts used to build Greenlight's
-│   │                  Skills conversationally, for reproducibility
+│   │                  Skill conversationally, for reproducibility
 │   └── index.ts     # orchestration entry point
 └── landing/
     └── index.html   # the product's own explanation of itself
@@ -115,17 +118,15 @@ for the conversation itself, the chat *is* the product.
 
 ## How this scales
 
-Right now, Greenlight is one Mind, wired to one creator's YouTube
-channel, that's a deliberate choice for a hackathon build, not a
-ceiling on the idea.
+Idea Scoring is live in the Minds Bazaar today, any creator can find
+it and equip it on their own Mind directly. That's the real
+distribution path: not "everyone messages this one Mind," but each
+creator launching their own (seconds, no code) and installing the
+same Skill onto it.
 
-The real path to other creators using this isn't "everyone messages
-this one Mind", each creator would launch their own Mind (seconds,
-no code, per Minds' own onboarding flow) and equip it with the same
-behavior, either by publishing the Idea Scoring and Proactive
-Follow-Up Skills to the Minds Bazaar for others to install, or by
-handing them the exact prompts in `src/skills/*.md`, which any Mind
-can be built from directly.
+`src/skills/idea-scoring-skill.md` still documents the exact prompts
+used to build it from scratch, kept for reproducibility and for
+anyone who'd rather build their own version than install this one.
 
 Along the way, we also found and fixed a real responsiveness gap
 for non-owner users, see "Known limitations", the kind of thing

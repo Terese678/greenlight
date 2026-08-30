@@ -1,4 +1,11 @@
-# Skill: Proactive Follow-Up
+# Proactive Follow-Up (a branch inside Idea Scoring, not a separate Skill)
+
+This documents the proactive follow-up behavior. It is not a
+standalone Skill, it's a branch inside the single "Idea Scoring"
+Skill (see `idea-scoring-skill.md`), kept here as its own file for
+clarity since it covers a distinct piece of behavior.
+
+## The proactive follow-up branch
 
 This Skill is what satisfies the "autonomous follow-up" requirement:
 Greenlight takes action without being prompted, based on new data
